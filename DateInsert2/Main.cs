@@ -16,9 +16,11 @@ namespace DateInsert2
         {
             base.WndProc(ref m);
 
-            if (m.Msg == HotKey.WM_HOTKEY)
+            switch (m.Msg)
             {
-                OnHotKeyPressed(m.WParam.ToInt32());
+                case HotKey.WM_HOTKEY:
+                    OnHotKeyPressed(m.WParam.ToInt32());
+                    break;
             }
         }
 
@@ -130,7 +132,8 @@ namespace DateInsert2
                 if (FrmSettings.ShowDlg(this))
                 {
                     SettingsChanged();
-                } else
+                }
+                else
                 {
                     RegisterHotKey();
                 }
@@ -180,7 +183,7 @@ namespace DateInsert2
         private void InsertDate()
         {
             if (inserting) return;
-            
+
             inserting = true;
 
             while (HotKey.IsAnyModifyers())
@@ -188,13 +191,18 @@ namespace DateInsert2
                 Application.DoEvents();
             }
 
-            var date = DateTime.Now.ToString(AppSettings.Default.FormatDate);
+            var date =
+#if DEBUG
+                new Random().Next().ToString();
+#else
+                DateTime.Now.ToString(AppSettings.Default.FormatDate);
+#endif
 
             DebugWrite.Line(date);
 
             Clipboard.SetText(date);
 
-            SendKeys.Send("^v");
+            SendKeys.SendWait("(+){INSERT}");
 
             inserting = false;
         }
