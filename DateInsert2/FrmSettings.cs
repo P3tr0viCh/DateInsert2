@@ -1,5 +1,6 @@
 ﻿using DateInsert2.Properties;
 using P3tr0viCh.Utils;
+using P3tr0viCh.Utils.Extensions;
 using System.Windows.Forms;
 
 namespace DateInsert2
@@ -15,17 +16,17 @@ namespace DateInsert2
         {
             using (var frm = new FrmSettings())
             {
-                AppSettings.Save();
+                AppSettings.Default.Save();
 
                 if (frm.ShowDialog(owner) == DialogResult.OK)
                 {
-                    AppSettings.Save();
+                    AppSettings.Default.Save();
 
                     return true;
                 }
                 else
                 {
-                    AppSettings.Load();
+                    AppSettings.Default.Load();
 
                     return false;
                 }

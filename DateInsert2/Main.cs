@@ -1,5 +1,7 @@
 ﻿using DateInsert2.Properties;
 using P3tr0viCh.Utils;
+using P3tr0viCh.Utils.Extensions;
+using P3tr0viCh.Utils.Forms;
 using System;
 using System.Windows.Forms;
 
@@ -71,7 +73,7 @@ namespace DateInsert2
 
             if (!SetProgramDirectory()) return;
 
-            AppSettings.Load();
+            AppSettings.Default.Load();
 
             SettingsChanged();
         }
@@ -103,7 +105,7 @@ namespace DateInsert2
 #endif
                     }
 
-                    AppSettings.Save();
+                    AppSettings.Default.Save();
 
                     break;
             }
@@ -155,10 +157,7 @@ namespace DateInsert2
         {
             miAbout.Enabled = false;
 
-            FrmAbout.Show(new FrmAbout.Options()
-            {
-                AppNameFontSize = 18
-            });
+            FrmAbout.Show(18);
 
             miAbout.Enabled = true;
         }
@@ -186,25 +185,36 @@ namespace DateInsert2
 
             inserting = true;
 
-            while (HotKey.IsAnyModifyers())
+            try
             {
-                Application.DoEvents();
-            }
+                while (HotKey.IsAnyModifyers())
+                {
+                    Application.DoEvents();
+                }
 
-            var date =
+                var date =
 #if DEBUG
-                new Random().Next().ToString();
+                    new Random().Next().ToString();
 #else
                 DateTime.Now.ToString(AppSettings.Default.FormatDate);
 #endif
 
-            DebugWrite.Line(date);
+                DebugWrite.Line(date);
 
-            Clipboard.SetText(date);
+                Clipboard.SetText(date);
 
-            SendKeys.SendWait("(+){INSERT}");
+                SendKeys.SendWait("(+){INSERT}");
+            }
+            catch (Exception e)
+            {
+                DebugWrite.Error(e);
 
-            inserting = false;
+                Msg.Error(e.Message);
+            }
+            finally
+            {
+                inserting = false;
+            }
         }
     }
 }
